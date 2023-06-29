@@ -21,9 +21,6 @@ class Job:
         """
         return {'title': self.title, 'salary': self.salary, 'description': self.description}
 
-    #def __str__(self):
-        #return f"{self.title} ({self.salary})\n{self.link}\n{self.description}"
-
     def __eq__(self, other):
         """
         Проверяет равенство объектов по зарплате.
@@ -31,9 +28,12 @@ class Job:
         :param other: Другой объект класса Job.
         :return: True, если зарплаты равны, иначе False.
         """
-        if isinstance(other, Job):
-            return self.salary == other.salary
-        return NotImplemented
+        try:
+            if isinstance(other, Job):
+                return self.validate_salary(self.salary) == self.validate_salary(other.salary)
+            return NotImplemented
+        except TypeError:
+            pass
 
     def __lt__(self, other):
         """
@@ -42,9 +42,14 @@ class Job:
         :param other: Другой объект класса Job.
         :return: True, если зарплата текущего объекта меньше зарплаты другого объекта, иначе False.
         """
-        if isinstance(other, Job):
-            return self.salary < other.salary
-        return NotImplemented
+        try:
+            if isinstance(other, Job):
+                if self.salary is None or other.salary is None:
+                    return False
+                return self.validate_salary(self.salary) < self.validate_salary(other.salary)
+            return NotImplemented
+        except TypeError:
+            pass
 
     def __gt__(self, other):
         """
@@ -53,18 +58,25 @@ class Job:
         :param other: Другой объект класса Job.
         :return: True, если зарплата текущего объекта больше зарплаты другого объекта, иначе False.
         """
-        if isinstance(other, Job):
-            return self.salary > other.salary
-        return NotImplemented
+        try:
+            if isinstance(other, Job):
+                if self.salary is None or other.salary is None:
+                    return False
+                return self.validate_salary(self.salary) > self.validate_salary(other.salary)
+            return NotImplemented
+        except TypeError:
+            pass
 
     @staticmethod
-    def validate_salary(self):
+    def validate_salary(salary):
         """
         Проверяет корректность значения зарплаты.
 
-        :param self: Объект класса Job.
+        :param salary:
         """
-        pass
+        if salary is None or salary == 0:
+            return float('-inf')
+        return salary
 
     @classmethod
     def from_dict(cls, data):

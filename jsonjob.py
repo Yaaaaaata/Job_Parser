@@ -28,9 +28,12 @@ class JsonJobFile(JobFile):
         :param jobs: Список объектов класса Job.
         """
         with open(self.file_name, "a", encoding="utf-8") as f:
-            for job in jobs:
+            f.write("[")
+            for i, job in enumerate(jobs):
                 json.dump(job, f, ensure_ascii=False)
-                f.write("\n")
+                if i != len(jobs) - 1:
+                    f.write(", \n")
+            f.write("]")
 
     def get_top_n_jobs(self, n):
         """
@@ -40,9 +43,30 @@ class JsonJobFile(JobFile):
         :return: Список объектов класса Job.
         """
         with open(self.file_name, "r", encoding="utf-8") as f:
-            #jobs = [Job(**json.loads(line)) for line in f]
-            jobs = [Job.from_dict(json.loads(line)) for line in f if line.strip()]
-        sorted_jobs = sorted(jobs, key=lambda x: x.salary or 0, reverse=True)
+            jobs = json.load(f)
+
+        def sort_key(job):
+            salary = job.get('salary')
+            if salary is not None:
+                salary_from = salary.get('from')
+                salary_to = salary.get('to')
+                if salary_to is None and salary_from is None:
+                    return 1, 2
+                elif salary_to is None:
+                    return salary_from
+                elif salary_from is None:
+                    return salary_to
+                else:
+                    return salary_from, salary_to
+            else:
+                payment_from = job.get('payment_from')
+                payment_to = job.get('payment_to')
+                if payment_to is None or payment_to == 0:
+                    return payment_from
+                else:
+                    return payment_to
+
+        sorted_jobs = sorted(jobs, key=sort_key, reverse=True)
         top_jobs = sorted_jobs[:n]
         return top_jobs
 
@@ -81,3 +105,7 @@ def get_jobs_from_sj():
     job_file.add_jobs(jobs)
     return jobs
 
+
+if __name__ == "__main__":
+    get_jobs_from_hh()
+    get_jobs_from_sj()
