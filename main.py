@@ -33,9 +33,9 @@ def menu():
             top_jobs = job_file.get_top_n_jobs(n)
             for i, job in enumerate(top_jobs):
                 profession = job.get('profession') or job.get('name')
-                payment_from = job.get('payment_from') or job.get('salary_from')
-                payment_to = job.get('payment_to') or job.get('salary_to')
-                currency = job.get('currency')
+                payment_from = job.get('payment_from') or job.get('salary', {}).get('from')
+                payment_to = job.get('payment_to') or job.get('salary', {}).get('to')
+                currency = job.get('currency') or job.get('salary', {}).get('currency')
                 print(f"{profession} Заработная плата: {payment_from} до {payment_to} {currency}")
         elif choice == "4":
             job_file.clear(None)

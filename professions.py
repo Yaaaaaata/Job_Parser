@@ -30,7 +30,9 @@ class Job:
         """
         try:
             if isinstance(other, Job):
-                return self.validate_salary(self.salary) == self.validate_salary(other.salary)
+                self_salary = self.validate_salary(self.salary)
+                other_salary = self.validate_salary(other.salary)
+                return self_salary == other_salary
             return NotImplemented
         except TypeError:
             pass
@@ -44,9 +46,11 @@ class Job:
         """
         try:
             if isinstance(other, Job):
-                if self.salary is None or other.salary is None:
+                self_salary = self.validate_salary(self.salary)
+                other_salary = self.validate_salary(other.salary)
+                if self_salary is None or other_salary is None:
                     return False
-                return self.validate_salary(self.salary) < self.validate_salary(other.salary)
+                return self_salary < other_salary
             return NotImplemented
         except TypeError:
             pass
@@ -60,9 +64,11 @@ class Job:
         """
         try:
             if isinstance(other, Job):
-                if self.salary is None or other.salary is None:
+                self_salary = self.validate_salary(self.salary)
+                other_salary = self.validate_salary(other.salary)
+                if self_salary is None or other_salary is None:
                     return False
-                return self.validate_salary(self.salary) > self.validate_salary(other.salary)
+                return self_salary > other_salary
             return NotImplemented
         except TypeError:
             pass
