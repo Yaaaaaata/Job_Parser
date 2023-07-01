@@ -46,25 +46,16 @@ class JsonJobFile(JobFile):
             jobs = json.load(f)
 
         def sort_key(job):
-            salary = job.get('salary')
-            if salary is not None:
-                salary_from = salary.get('from')
-                salary_to = salary.get('to')
-                if salary_to is None and salary_from is None:
-                    return 1, 2
-                elif salary_to is None:
-                    return salary_from
-                elif salary_from is None:
-                    return salary_to
-                else:
-                    return salary_from, salary_to
-            else:
-                payment_from = job.get('payment_from')
-                payment_to = job.get('payment_to')
-                if payment_to is None or payment_to == 0:
-                    return payment_from
-                else:
-                    return payment_to
+            try:
+                salary = job['salary']
+                if salary is None:
+                    raise KeyError
+                payment_from = salary.get('from') or 0
+                payment_to = salary.get('to') or 0
+            except KeyError:
+                payment_from = job.get('payment_from') or 0
+                payment_to = job.get('payment_to') or 0
+            return (payment_from + payment_to) / 2
 
         sorted_jobs = sorted(jobs, key=sort_key, reverse=True)
         top_jobs = sorted_jobs[:n]
